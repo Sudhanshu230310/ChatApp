@@ -121,6 +121,3 @@ The application is designed to run on Replit with auto-scaling deployments. For 
 3. Make your changes
 4. Submit a pull request
 
-## License
-
-MIT License - see LICENSE file for details
