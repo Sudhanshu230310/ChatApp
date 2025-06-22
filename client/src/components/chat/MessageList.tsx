@@ -2,13 +2,16 @@ import { useEffect, useRef } from "react";
 import { formatTime } from "@/lib/utils";
 import type { MessageWithUser } from "@shared/schema";
 import { Info } from "lucide-react";
+import MessageReactions from "./MessageReactions";
 
 interface MessageListProps {
   username: string;
   messages: MessageWithUser[];
+  onAddReaction: (messageId: number, emoji: string) => void;
+  onRemoveReaction: (messageId: number, emoji: string) => void;
 }
 
-export default function MessageList({ username, messages }: MessageListProps) {
+export default function MessageList({ username, messages, onAddReaction, onRemoveReaction }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -63,14 +66,29 @@ export default function MessageList({ username, messages }: MessageListProps) {
                   <span className="text-sm font-medium text-slate-800">You</span>
                 )}
               </div>
-              <div className={`p-3 rounded-2xl shadow-sm max-w-xs lg:max-w-md xl:max-w-lg ${
-                isCurrentUser
-                  ? "bg-blue-500 text-white rounded-tr-md"
-                  : "bg-white border border-slate-200 rounded-tl-md"
-              }`}>
-                <p className={isCurrentUser ? "text-white" : "text-slate-700"}>
-                  {message.content}
-                </p>
+              <div>
+                <div className={`p-3 rounded-2xl shadow-sm max-w-xs lg:max-w-md xl:max-w-lg ${
+                  isCurrentUser
+                    ? "bg-blue-500 text-white rounded-tr-md"
+                    : "bg-white border border-slate-200 rounded-tl-md"
+                }`}>
+                  <p className={isCurrentUser ? "text-white" : "text-slate-700"}>
+                    {message.content}
+                  </p>
+                </div>
+                {message.parsedReactions && Object.keys(message.parsedReactions).length > 0 && (
+                  <MessageReactions
+                    messageId={message.id}
+                    reactions={Object.entries(message.parsedReactions).map(([emoji, data]) => ({
+                      emoji,
+                      count: data.count,
+                      users: data.users,
+                    }))}
+                    currentUser={username}
+                    onAddReaction={onAddReaction}
+                    onRemoveReaction={onRemoveReaction}
+                  />
+                )}
               </div>
             </div>
           </div>

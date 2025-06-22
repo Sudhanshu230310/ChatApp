@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Smile } from "lucide-react";
+import { Send } from "lucide-react";
+import EmojiPicker from "./EmojiPicker";
 
 interface MessageInputProps {
   connectionStatus: "disconnected" | "connecting" | "connected" | "error";
@@ -17,6 +18,10 @@ export default function MessageInput({ connectionStatus, onSendMessage }: Messag
       onSendMessage(message.trim());
       setMessage("");
     }
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    setMessage(prev => prev + emoji);
   };
 
   const getStatusColor = () => {
@@ -55,12 +60,9 @@ export default function MessageInput({ connectionStatus, onSendMessage }: Messag
             className="w-full px-4 py-3 pr-12 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-slate-800 placeholder-slate-400"
             disabled={connectionStatus !== "connected"}
           />
-          <button
-            type="button"
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition duration-150"
-          >
-            <Smile size={18} />
-          </button>
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+            <EmojiPicker onEmojiSelect={handleEmojiSelect} />
+          </div>
         </div>
         <Button
           type="submit"

@@ -7,6 +7,8 @@ A modern real-time chat application built with React, Express, and WebSockets. F
 - **Real-time messaging** - Messages appear instantly using WebSockets
 - **User presence** - See who's online in the sidebar
 - **Message history** - Previous messages load when you join
+- **Emoji support** - Rich emoji picker with categories and quick reactions
+- **Message reactions** - React to messages with emojis
 - **Modern UI** - Built with shadcn/ui components and Tailwind CSS
 - **PostgreSQL database** - Persistent message and user storage
 - **Responsive design** - Works on desktop and mobile
@@ -91,6 +93,9 @@ The application will be available at `http://localhost:5000`
 - `join` - User joins the chat room
 - `send_message` - Send a new message
 - `new_message` - Receive a new message
+- `add_reaction` - Add emoji reaction to a message
+- `remove_reaction` - Remove emoji reaction from a message
+- `reaction_updated` - Message reactions have been updated
 - `user_joined` - Someone joined the chat
 - `user_left` - Someone left the chat
 - `online_users` - List of currently online users

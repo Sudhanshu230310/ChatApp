@@ -102,8 +102,15 @@ Located in `shared/schema.ts`:
 - `DATABASE_URL`: PostgreSQL connection string (required)
 - `NODE_ENV`: Environment mode (development/production)
 
-Changelog:
-- June 22, 2025. Initial setup
+## Recent Changes
+
+- June 22, 2025: Initial chat application setup with real-time messaging
+- June 22, 2025: Added comprehensive emoji features:
+  - Rich emoji picker with 5 categories (150+ emojis)
+  - Message reactions with real-time updates
+  - Quick reaction buttons for popular emojis
+  - Database storage for persistent reactions
+  - Enhanced WebSocket events for emoji synchronization
 
 ## User Preferences
 

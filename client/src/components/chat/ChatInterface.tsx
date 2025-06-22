@@ -10,6 +10,8 @@ interface ChatInterfaceProps {
   messages: MessageWithUser[];
   onlineUsers: string[];
   onSendMessage: (content: string) => void;
+  onAddReaction: (messageId: number, emoji: string) => void;
+  onRemoveReaction: (messageId: number, emoji: string) => void;
 }
 
 export default function ChatInterface({
@@ -18,6 +20,8 @@ export default function ChatInterface({
   messages,
   onlineUsers,
   onSendMessage,
+  onAddReaction,
+  onRemoveReaction,
 }: ChatInterfaceProps) {
   return (
     <div className="min-h-screen bg-slate-50">
@@ -27,7 +31,12 @@ export default function ChatInterface({
         <OnlineUsers username={username} onlineUsers={onlineUsers} />
         
         <main className="flex-1 flex flex-col">
-          <MessageList username={username} messages={messages} />
+          <MessageList 
+            username={username} 
+            messages={messages} 
+            onAddReaction={onAddReaction}
+            onRemoveReaction={onRemoveReaction}
+          />
           <MessageInput connectionStatus={connectionStatus} onSendMessage={onSendMessage} />
         </main>
       </div>

@@ -61,6 +61,13 @@ export default function Chat() {
       case "online_users":
         setOnlineUsers(data.users);
         break;
+      case "reaction_updated":
+        setMessages(prev => prev.map(msg => 
+          msg.id === data.messageId 
+            ? { ...msg, parsedReactions: data.reactions }
+            : msg
+        ));
+        break;
       case "error":
         console.error("WebSocket error:", data.message);
         break;
@@ -113,6 +120,26 @@ export default function Chat() {
     }
   };
 
+  const handleAddReaction = (messageId: number, emoji: string) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        type: "add_reaction",
+        messageId,
+        emoji,
+      }));
+    }
+  };
+
+  const handleRemoveReaction = (messageId: number, emoji: string) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        type: "remove_reaction",
+        messageId,
+        emoji,
+      }));
+    }
+  };
+
   if (!isConnected) {
     return (
       <LoginScreen
@@ -129,6 +156,8 @@ export default function Chat() {
       messages={messages}
       onlineUsers={onlineUsers}
       onSendMessage={handleSendMessage}
+      onAddReaction={handleAddReaction}
+      onRemoveReaction={handleRemoveReaction}
     />
   );
 }

@@ -8,6 +8,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   createMessage(message: InsertMessage): Promise<MessageWithUser>;
   getRecentMessages(limit?: number): Promise<MessageWithUser[]>;
+  updateMessageReactions(messageId: number, reactions: Record<string, { count: number; users: string[] }>): Promise<MessageWithUser | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -44,6 +45,29 @@ export class DatabaseStorage implements IStorage {
     return {
       ...messageWithUser[0].messages,
       user: messageWithUser[0].users,
+      parsedReactions: messageWithUser[0].messages.reactions ? JSON.parse(messageWithUser[0].messages.reactions) : {},
+    };
+  }
+
+  async updateMessageReactions(messageId: number, reactions: Record<string, { count: number; users: string[] }>): Promise<MessageWithUser | undefined> {
+    const [updatedMessage] = await db
+      .update(messages)
+      .set({ reactions: JSON.stringify(reactions) })
+      .where(eq(messages.id, messageId))
+      .returning();
+
+    if (!updatedMessage) return undefined;
+
+    const messageWithUser = await db
+      .select()
+      .from(messages)
+      .innerJoin(users, eq(messages.userId, users.id))
+      .where(eq(messages.id, messageId));
+
+    return {
+      ...messageWithUser[0].messages,
+      user: messageWithUser[0].users,
+      parsedReactions: reactions,
     };
   }
 
@@ -58,6 +82,7 @@ export class DatabaseStorage implements IStorage {
     return result.map(row => ({
       ...row.messages,
       user: row.users,
+      parsedReactions: row.messages.reactions ? JSON.parse(row.messages.reactions) : {},
     })).reverse();
   }
 }

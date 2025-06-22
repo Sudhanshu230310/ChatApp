@@ -13,6 +13,7 @@ export const messages = pgTable("messages", {
   id: serial("id").primaryKey(),
   content: text("content").notNull(),
   userId: integer("user_id").notNull().references(() => users.id),
+  reactions: text("reactions").default("{}"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -44,4 +45,5 @@ export type Message = typeof messages.$inferSelect;
 
 export type MessageWithUser = Message & {
   user: User;
+  parsedReactions?: Record<string, { count: number; users: string[] }>;
 };

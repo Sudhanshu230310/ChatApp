@@ -67,6 +67,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             await handleSendMessage(clientId, message.content);
             break;
 
+          case "add_reaction":
+            await handleAddReaction(clientId, message.messageId, message.emoji);
+            break;
+
+          case "remove_reaction":
+            await handleRemoveReaction(clientId, message.messageId, message.emoji);
+            break;
+
           default:
             console.log("Unknown message type:", message.type);
         }
@@ -190,6 +198,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
         client.ws.send(messageStr);
       }
     });
+  }
+
+  async function handleAddReaction(clientId: string, messageId: number, emoji: string) {
+    const client = clients.get(clientId);
+    if (!client) return;
+
+    try {
+      // Get current message with reactions
+      const messages = await storage.getRecentMessages(1000);
+      const message = messages.find(m => m.id === messageId);
+      if (!message) return;
+
+      const reactions = message.parsedReactions || {};
+      
+      if (!reactions[emoji]) {
+        reactions[emoji] = { count: 0, users: [] };
+      }
+
+      if (!reactions[emoji].users.includes(client.username)) {
+        reactions[emoji].users.push(client.username);
+        reactions[emoji].count++;
+      }
+
+      const updatedMessage = await storage.updateMessageReactions(messageId, reactions);
+      if (updatedMessage) {
+        broadcastToAll({
+          type: "reaction_updated",
+          messageId,
+          reactions: updatedMessage.parsedReactions,
+        });
+      }
+    } catch (error) {
+      console.error("Error adding reaction:", error);
+    }
+  }
+
+  async function handleRemoveReaction(clientId: string, messageId: number, emoji: string) {
+    const client = clients.get(clientId);
+    if (!client) return;
+
+    try {
+      // Get current message with reactions
+      const messages = await storage.getRecentMessages(1000);
+      const message = messages.find(m => m.id === messageId);
+      if (!message) return;
+
+      const reactions = message.parsedReactions || {};
+      
+      if (reactions[emoji] && reactions[emoji].users.includes(client.username)) {
+        reactions[emoji].users = reactions[emoji].users.filter(u => u !== client.username);
+        reactions[emoji].count--;
+        
+        if (reactions[emoji].count === 0) {
+          delete reactions[emoji];
+        }
+      }
+
+      const updatedMessage = await storage.updateMessageReactions(messageId, reactions);
+      if (updatedMessage) {
+        broadcastToAll({
+          type: "reaction_updated",
+          messageId,
+          reactions: updatedMessage.parsedReactions,
+        });
+      }
+    } catch (error) {
+      console.error("Error removing reaction:", error);
+    }
   }
 
   function generateClientId(): string {
