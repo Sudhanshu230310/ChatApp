@@ -1,6 +1,6 @@
 # Real-time Chat Application
 
-![Chat_App]()
+![Chat_App](./landing.png)
 
 A modern real-time chat application built with React, Express, and WebSockets. Features instant messaging, user presence tracking, and a beautiful UI.
 
